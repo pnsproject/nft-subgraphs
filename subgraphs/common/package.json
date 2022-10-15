@@ -14,12 +14,13 @@
   },
   "scripts": {
     "_prepare": "scripts/prepare.sh",
-    "prepare_moonbeam": "npx graph-compiler --config config/nfts.moonbeam.json --include node_modules/@openzeppelin/subgraphs/src/datasources --export-schema --export-subgraph",
+    "prepare_moonbeam": "npx graph-compiler --config config/nfts.moonbeam.json --include node_modules/openzeppelin-subgraphs/src/datasources --export-schema --export-subgraph",
     "build": "scripts/build.sh generated/*.subgraph.yaml"
   },
   "dependencies": {
     "@amxx/graphprotocol-utils": "^1.1.0",
-    "@openzeppelin/subgraphs": "0.1.8-5"
+    "@openzeppelin/subgraphs": "0.1.8-5",
+    "@openzeppelin/contracts": "4.7.3"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.34.0",
