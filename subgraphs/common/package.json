@@ -13,7 +13,8 @@
     "url": "https://github.com/amxx/subgraphs.git/issues"
   },
   "scripts": {
-    "prepare": "scripts/prepare.sh",
+    "_prepare": "scripts/prepare.sh",
+    "prepare_moonbeam": "npx graph-compiler --config config/nfts.moonbeam.json --include node_modules/@openzeppelin/subgraphs/src/datasources --export-schema --export-subgraph",
     "build": "scripts/build.sh generated/*.subgraph.yaml"
   },
   "dependencies": {
