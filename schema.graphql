@@ -1,212 +1,114 @@
-type Domain @entity {
-  id: ID!                                               # The namehash of the name
-  name: String                                          # The human readable name, if known. Unknown portions replaced with hash in square brackets (eg, foo.[1234].eth)
-  labelName: String                                     # The human readable label name (imported from CSV), if known
-  labelhash: Bytes                                      # keccak256(labelName)
-  parent: Domain                                        # The namehash (id) of the parent name
-  subdomains: [Domain!] @derivedFrom(field: "parent")  # Can count domains from length of array
-  subdomainCount: Int!                                  # The number of subdomains
-  resolvedAddress: Account                              # Address logged from current resolver, if any
-  owner: Account
-  resolver: Resolver
-  createdAt: BigInt!
-  events: [DomainEvent!] @derivedFrom(field: "domain")
-}
-
-interface DomainEvent {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-}
-
-type SetNftName implements DomainEvent @entity {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  nftAddr: Account!
-  nftTokenId: BigInt!
-}
-
-type Set implements DomainEvent @entity {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  keyHash: BigInt! 
-  value: String!
-}
-
-type SetLink implements DomainEvent @entity {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  keyHash: BigInt! 
-  value: BigInt!
-}
-
-type Transfer implements DomainEvent @entity {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  from: Account
-  to: Account!
-}
-
-type NewSubdomain implements DomainEvent @entity {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  to: Account!
-  parentId: Domain!
-  name: String!
-}
-
-type NewResolver implements DomainEvent @entity {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  resolver: Resolver!
-}
-
-
 type Account @entity {
-  id: ID!
-  domains: [Domain!]! @derivedFrom(field: "owner")
-  authorities: [AuthorisationChanged!] @derivedFrom(field: "owner")
-  authoriseds: [AuthorisationChanged!] @derivedFrom(field: "target")
-  registrations: [RegistrationEvent!] @derivedFrom(field: "registrant")
-  events: [AccountEvent!] @derivedFrom(field: "account")
+	id: Bytes!
+	asERC721: ERC721Contract
+	ERC721tokens: [ERC721Token!]! @derivedFrom(field: "owner")
+	ERC721operatorOwner: [ERC721Operator!]! @derivedFrom(field: "owner")
+	ERC721operatorOperator: [ERC721Operator!]! @derivedFrom(field: "operator")
+	ERC721transferFromEvent: [ERC721Transfer!]! @derivedFrom(field: "from")
+	ERC721transferToEvent: [ERC721Transfer!]! @derivedFrom(field: "to")
+	# asERC1155: ERC1155Contract
+	# ERC1155balances: [ERC1155Balance!]! @derivedFrom(field: "account")
+	# ERC1155operatorOwner: [ERC1155Operator!]! @derivedFrom(field: "owner")
+	# ERC1155operatorOperator: [ERC1155Operator!]! @derivedFrom(field: "operator")
+	# ERC1155transferFromEvent: [ERC1155Transfer!]! @derivedFrom(field: "from")
+	# ERC1155transferToEvent: [ERC1155Transfer!]! @derivedFrom(field: "to")
+	# ERC1155transferOperatorEvent: [ERC1155Transfer!]! @derivedFrom(field: "operator")
+	events: [Event!]! @derivedFrom(field: "emitter")
 }
-
-interface AccountEvent {
-  id: ID!
-  account: Account!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
+type ERC721Contract @entity(immutable: true) {
+	id: Bytes!
+	asAccount: Account!
+	supportsMetadata: Boolean
+	name: String
+	symbol: String
+	tokens: [ERC721Token!]! @derivedFrom(field: "contract")
+	operators: [ERC721Operator!]! @derivedFrom(field: "contract")
+	transfers: [ERC721Transfer!]! @derivedFrom(field: "contract")
 }
-
-type SetName implements AccountEvent @entity {
-  id: ID!
-  account: Account!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  tokenId: Domain!
+type ERC721Token @entity {
+	id: ID!
+	contract: ERC721Contract!
+	identifier: BigInt!
+	owner: Account!
+	approval: Account!
+	uri: String
+	transfers: [ERC721Transfer!]! @derivedFrom(field: "token")
 }
-
-type Approval implements AccountEvent @entity {
-  id: ID!
-  account: Account!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  operator: Account!
-  tokens: Domain!
+type ERC721Operator @entity {
+	id: ID!
+	contract: ERC721Contract!
+	owner: Account!
+	operator: Account!
+	approved: Boolean!
 }
-
-type Registration @entity {
-  id: ID!
-  domain: Domain
-  origin: Domain
-  expiryDate: BigInt!
-  capacity: BigInt
-  labelName: String
-  events: [RegistrationEvent!]! @derivedFrom(field: "registration")
+type ERC721Transfer implements Event @entity(immutable: true) {
+	id: ID!
+	emitter: Account!
+	transaction: Transaction!
+	timestamp: BigInt!
+	contract: ERC721Contract!
+	token: ERC721Token!
+	from: Account!
+	to: Account!
 }
-
-interface RegistrationEvent {
-  id: ID!
-  registration: Registration!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  registrant: Account!
+# type ERC1155Contract @entity(immutable: true) {
+# 	id: Bytes!
+# 	asAccount: Account!
+# 	tokens: [ERC1155Token!]! @derivedFrom(field: "contract")
+# 	balances: [ERC1155Balance!]! @derivedFrom(field: "contract")
+# 	operators: [ERC1155Operator!]! @derivedFrom(field: "contract")
+# 	transfers: [ERC1155Transfer!]! @derivedFrom(field: "contract")
+# }
+# type ERC1155Token @entity {
+# 	id: ID!
+# 	contract: ERC1155Contract!
+# 	identifier: BigInt!
+# 	uri: String
+# 	totalSupply: ERC1155Balance!
+# 	balances: [ERC1155Balance!]! @derivedFrom(field: "token")
+# 	transfers: [ERC1155Transfer!]! @derivedFrom(field: "token")
+# }
+# type ERC1155Balance @entity {
+# 	id: ID!
+# 	contract: ERC1155Contract!
+# 	token: ERC1155Token!
+# 	account: Account
+# 	value: BigDecimal!
+# 	valueExact: BigInt!
+# 	transferFromEvent: [ERC1155Transfer!]! @derivedFrom(field: "fromBalance")
+# 	transferToEvent: [ERC1155Transfer!]! @derivedFrom(field: "toBalance")
+# }
+# type ERC1155Operator @entity {
+# 	id: ID!
+# 	contract: ERC1155Contract!
+# 	owner: Account!
+# 	operator: Account!
+# 	approved: Boolean!
+# }
+# type ERC1155Transfer implements Event @entity(immutable: true) {
+# 	id: ID!
+# 	emitter: Account!
+# 	transaction: Transaction!
+# 	timestamp: BigInt!
+# 	contract: ERC1155Contract!
+# 	token: ERC1155Token!
+# 	operator: Account!
+# 	from: Account
+# 	fromBalance: ERC1155Balance
+# 	to: Account
+# 	toBalance: ERC1155Balance
+# 	value: BigDecimal!
+# 	valueExact: BigInt!
+# }
+interface Event {
+	id: ID!
+	transaction: Transaction!
+	emitter: Account!
+	timestamp: BigInt!
 }
-
-type CapacityUpdated implements RegistrationEvent @entity {
-  id: ID!
-  registration: Registration!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  registrant: Account!
-  domain: Domain!
-  capacity: BigInt!
-}
-
-type NameRegistered implements RegistrationEvent @entity {
-  id: ID!
-  registration: Registration!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  registrant: Account!
-  expiryDate: BigInt!
-  cost: BigInt
-}
-
-type NameRenewed implements RegistrationEvent @entity {
-  id: ID!
-  registration: Registration!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  registrant: Account!
-  expiryDate: BigInt!
-  cost: BigInt
-}
-
-
-type PriceChanged @entity {
-  id: ID!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-
-  basePrices: [BigInt!]!
-  rentPrices: [BigInt!]!
-}
-
-type Resolver @entity {
-  id: ID!                   # Concatenation of resolver address and namehash
-  domain: Domain
-  address: Bytes!           # Address of resolver contract
-
-  addr: Account             # Current value of addr record (per events)
-  contentHash: Bytes        # Content hash, in binary format.
-  texts: [String!]          # Set of observed text record keys
-  coinTypes: [BigInt!]      # Set of observed SLIP-44 coin types
-  events: [ResolverEvent!]! @derivedFrom(field: "resolver")
-}
-
-interface ResolverEvent {
-  id: ID!                   # Concatenation of block number and log ID
-  resolver: Resolver!       # Used to derive relationships to Resolvers
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-}
-
-type AuthorisationChanged @entity {
-  id: ID!
-  blockNumber: Int!
-  triggeredDate: BigInt!
-  transactionID: Bytes!
-  owner: Account!
-  target: Account!
-  isAuthorized: Boolean!
+type Transaction @entity(immutable: true) {
+	id: ID!
+	timestamp: BigInt!
+	blockNumber: BigInt!
+	events: [Event!]! @derivedFrom(field: "transaction")
 }
