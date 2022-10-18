@@ -61,7 +61,7 @@ function tokenId(contractAddress: Address, tokenId: BigInt): string {
   return contractAddress
     .toString()
     .concat("-")
-    .concat(tokenId.toHex());
+    .concat(tokenId.toHexString());
 }
 
 function fetchAccount(address: Address): Account {
@@ -71,7 +71,7 @@ function fetchAccount(address: Address): Account {
 }
 
 function fetchTransaction(event: ethereum.Event): Transaction {
-  let tx = new Transaction(event.transaction.hash.toHex());
+  let tx = new Transaction(event.transaction.hash.toHexString());
   tx.timestamp = event.block.timestamp;
   tx.blockNumber = event.block.number;
   tx.save();
