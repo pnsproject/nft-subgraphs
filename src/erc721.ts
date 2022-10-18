@@ -59,7 +59,7 @@ function eventId(event: ethereum.Event): string {
 
 function tokenId(contractAddress: Address, tokenId: BigInt): string {
   return contractAddress
-    .toString()
+    .toHexString()
     .concat("-")
     .concat(tokenId.toHexString());
 }
