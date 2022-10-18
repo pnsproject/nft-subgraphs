@@ -38,6 +38,7 @@ export function handleTransfer(event: TransferEvent): void {
   let ev = new ERC721Transfer(eventId(event));
   ev.emitter = fetchAccount(event.address).id;
   ev.transaction = fetchTransaction(event).id;
+  ev.timestamp = event.block.timestamp;
   ev.contract = fetchContract(event.address).id;
   ev.from = fetchAccount(event.params.from).id;
   ev.to = fetchAccount(event.params.to).id;
