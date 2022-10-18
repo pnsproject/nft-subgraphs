@@ -86,14 +86,8 @@ function fetchToken(
 ): ERC721Token {
   let token = new ERC721Token(tokenId);
 
-  if (token.contract == null) {
-    token.contract = contract;
-  }
-
-  if (token.identifier == null) {
-    token.identifier = identifier;
-  }
-
+  token.contract = contract;
+  token.identifier = identifier;
   token.owner = owner;
   token.save();
 
