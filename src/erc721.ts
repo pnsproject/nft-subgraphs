@@ -15,21 +15,19 @@ import {
 } from "./types/schema";
 
 export function handleApproval(event: ApprovalEvent): void {
-  let ev = new ERC721Token(
-    tokenId(event.receipt!.contractAddress, event.params.tokenId)
-  );
-  ev.contract = fetchContract(event.receipt!.contractAddress).id;
+  let ev = new ERC721Token(tokenId(event.address, event.params.tokenId));
+  ev.contract = fetchContract(event.address).id;
   ev.owner = fetchAccount(event.params.owner).id;
   ev.approval = fetchAccount(event.params.approved).id;
   ev.identifier = event.params.tokenId;
-  let endpoint = IERC721.bind(event.receipt!.contractAddress);
+  let endpoint = IERC721.bind(event.address);
   ev.uri = endpoint.tokenURI(event.params.tokenId);
   ev.save();
 }
 
 export function handleApprovalForAll(event: ApprovalForAllEvent): void {
   let ev = new ERC721Operator(eventId(event));
-  ev.contract = fetchContract(event.receipt!.contractAddress).id;
+  ev.contract = fetchContract(event.address).id;
   ev.owner = fetchAccount(event.params.owner).id;
   ev.operator = fetchAccount(event.params.operator).id;
   ev.approved = event.params.approved;
@@ -40,11 +38,11 @@ export function handleTransfer(event: TransferEvent): void {
   let ev = new ERC721Transfer(eventId(event));
   ev.emitter = fetchAccount(event.address).id;
   ev.transaction = fetchTransaction(event).id;
-  ev.contract = fetchContract(event.receipt!.contractAddress).id;
+  ev.contract = fetchContract(event.address).id;
   ev.from = fetchAccount(event.params.from).id;
   ev.to = fetchAccount(event.params.to).id;
   ev.token = fetchToken(
-    tokenId(event.receipt!.contractAddress, event.params.tokenId),
+    tokenId(event.address, event.params.tokenId),
     ev.to,
     ev.contract,
     event.params.tokenId
