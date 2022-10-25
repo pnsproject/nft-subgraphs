@@ -36,9 +36,9 @@ export function handleApprovalForAll(event: ApprovalForAllEvent): void {
 
 export function handleTransfer(event: TransferEvent): void {
   let ev = new ERC721Transfer(eventId(event));
+  ev.timestamp = event.block.timestamp;
   ev.emitter = fetchAccount(event.address).id;
   ev.transaction = fetchTransaction(event).id;
-  ev.timestamp = event.block.timestamp;
   ev.contract = fetchContract(event.address).id;
   ev.from = fetchAccount(event.params.from).id;
   ev.to = fetchAccount(event.params.to).id;
@@ -102,8 +102,17 @@ export function fetchContract(address: Address): ERC721Contract {
   if (contract == null) {
     let endpoint = IERC721.bind(address);
     contract = new ERC721Contract(account.id);
-    contract.name = endpoint.name();
-    contract.symbol = endpoint.symbol();
+    let try_name = endpoint.try_name();
+    let try_symbol = endpoint.try_symbol();
+
+    if (!try_name.reverted) {
+      contract.name = try_name.value;
+    }
+
+    if (!try_symbol.reverted) {
+      contract.symbol = try_symbol.value;
+    }
+
     // interfaceId
     // ERC165               0x01ffc9a7
     // ERC721               0x80ac58cd
