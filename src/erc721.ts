@@ -21,7 +21,11 @@ export function handleApproval(event: ApprovalEvent): void {
   ev.approval = fetchAccount(event.params.approved).id;
   ev.identifier = event.params.tokenId;
   let endpoint = IERC721.bind(event.address);
-  ev.uri = endpoint.tokenURI(event.params.tokenId);
+  let try_tokenURI = endpoint.try_tokenURI(event.params.tokenId);
+  if (!try_tokenURI.reverted) {
+    ev.uri = try_tokenURI.value;
+  }
+
   ev.save();
 }
 
