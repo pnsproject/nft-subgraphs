@@ -124,9 +124,13 @@ export function fetchContract(address: Address): ERC721Contract {
     // ERC721TokenReceiver  0x150b7a02
     // ERC721Enumerable     0x780e9d63
     // AccessControl        0x7965db0b
-    contract.supportsMetadata = endpoint.supportsInterface(
+    let try_supportsMetadata = endpoint.try_supportsInterface(
       Bytes.fromHexString("0x5b5e139f")
     );
+    if (!try_supportsMetadata.reverted) {
+      contract.supportsMetadata = try_supportsMetadata.value;
+    }
+
     contract.asAccount = account.id;
     account.asERC721 = contract.id;
     contract.save();
