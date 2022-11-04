@@ -7,10 +7,10 @@
     "codegen": "graph codegen --output-dir src/types/",
     "setup": "yarn codegen && yarn create-local && yarn deploy-local",
     "create-local": "graph create graphprotocol/erc721 --node http://127.0.0.1:9020",
-    "deploy-local": "graph deploy graphprotocol/erc721 --ipfs http://localhost:5001 --node http://127.0.0.1:9020/ --version-label 0.0.1",
+    "deploy-local": "graph deploy graphprotocol/erc721 --ipfs http://ipfsnode.raindrop.link:25001 --node http://127.0.0.1:9020/ --version-label 0.0.1",
     "remove-local": "graph remove graphprotocol/erc721 --node http://127.0.0.1:9020",
     "build": "graph build",
-    "watch-local": "graph deploy graphprotocol/erc721 --watch --node http://127.0.0.1:9020/ --ipfs http://localhost:5001"
+    "watch-local": "graph deploy graphprotocol/erc721 --watch --node http://127.0.0.1:9020/ --ipfs http://ipfsnode.raindrop.link:25001"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.34.0",
