@@ -13,9 +13,9 @@
     "watch-local": "graph deploy graphprotocol/erc721 --watch --node http://127.0.0.1:9020/ --ipfs http://ipfsnode.raindrop.link:25001"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.34.0",
-    "@graphprotocol/graph-ts": "^0.28.0",
+    "@graphprotocol/graph-cli": "^0.35.0",
+    "@graphprotocol/graph-ts": "^0.29.0",
     "@openzeppelin/subgraphs": "^0.1.8-5",
-    "@openzeppelin/contracts": "^4.7.3"
+    "@openzeppelin/contracts": "^4.8.0"
   }
 }
